@@ -1,0 +1,22 @@
+market:
+  universes:
+
+    primary:
+      indices:
+        - NIFTY
+        - BANKNIFTY
+
+      options:
+        underlyings:
+          - NIFTY
+          - BANKNIFTY
+
+        weekly: true
+        monthly: true
+        atm_range: 20
+
+    stocks:
+      equities:
+        - RELIANCE
+        - TCS
+        - INFY

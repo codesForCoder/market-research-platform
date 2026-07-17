@@ -22,6 +22,9 @@ class InstrumentRepository:
             list[Instrument]
         ] = defaultdict(list)
 
+        #Metadata
+        self._exchange_segments: set[tuple[str, str]] = set()
+
     def add(self, instrument: Instrument) -> None:
         """Add an instrument and update all indexes."""
 
@@ -38,6 +41,9 @@ class InstrumentRepository:
         # Composite index
         exchange_segment  = (instrument.exchange, instrument.segment)
         self._by_exchange_segment[exchange_segment ].append(instrument)
+
+        #Metadata
+        self._exchange_segments.add(exchange_segment)
 
     def get_by_instrument_id(
             self,
@@ -56,6 +62,8 @@ class InstrumentRepository:
             (exchange, segment),
             [],
         )
+    def get_exchange_segments(self) -> set[tuple[str, str]]:
+        return self._exchange_segments
 
     def __len__(self) -> int:
         return len(self._by_instrument_id)
