@@ -1,9 +1,12 @@
+from app.brokers.dhan.dhan_market_data_client import DhanMarketDataClient
+from app.core.config import get_settings
 from app.core.http_client import http_client
 
 from app.brokers.dhan.instrument_downloader import InstrumentDownloader
 from app.brokers.dhan.seed_csv_loader import SeedCsvLoader
 from app.brokers.dhan.instrument_data_source import InstrumentDataSource
 from app.brokers.dhan.instrument_mapper import DhanInstrumentMapper
+from app.market_data.websocket_manager import WebSocketManager
 
 from app.repository.repository_builder import RepositoryBuilder
 from app.repository.repository_manager import RepositoryManager
@@ -36,4 +39,10 @@ instrument_loader = InstrumentLoader(
 
 instrument_scheduler = InstrumentScheduler(
     instrument_loader,
+)
+
+market_data_client = DhanMarketDataClient()
+
+websocket_manager = WebSocketManager(
+    market_data_client,
 )
