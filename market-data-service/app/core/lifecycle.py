@@ -1,5 +1,9 @@
 from loguru import logger
+
+from app.bootstrap import instrument_loader, instrument_scheduler
+from app.core.http_client import http_client
 from app.core.logging import configure_logging
+
 
 async def startup():
     configure_logging()
@@ -8,11 +12,12 @@ async def startup():
     #
     # Load yesterday's instrument repository
     #
-
+    await instrument_loader.load()
     #
     # Start APScheduler
     #
-
+    logger.info("Starting scheduler .....")
+    await instrument_scheduler.start()
     #
     # Start websocket listener
     #
@@ -27,9 +32,11 @@ async def shutdown():
     #
     # Stop scheduler
     #
-
+    logger.info("stopping scheduler .....")
+    await instrument_scheduler.stop()
     #
-    # Close websocket
+    # Close websocket and http client
     #
+    await http_client.aclose()
 
     logger.info("Shutdown complete")
