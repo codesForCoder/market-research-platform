@@ -1,5 +1,4 @@
 from app.brokers.dhan.dhan_market_data_client import DhanMarketDataClient
-from app.core.config import get_settings
 from app.core.http_client import http_client
 
 from app.brokers.dhan.instrument_downloader import InstrumentDownloader
@@ -41,8 +40,11 @@ instrument_scheduler = InstrumentScheduler(
     instrument_loader,
 )
 
-market_data_client = DhanMarketDataClient()
 
+#Dhan support 5 clients
+websocket_clients = []
+for websocket_client_count in range(5):
+    websocket_clients.append(DhanMarketDataClient())
 websocket_manager = WebSocketManager(
-    market_data_client,
+    websocket_clients
 )
