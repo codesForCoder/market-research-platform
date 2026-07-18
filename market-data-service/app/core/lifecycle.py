@@ -1,6 +1,6 @@
 from loguru import logger
 
-from app.bootstrap import instrument_loader, instrument_scheduler, websocket_manager
+from app.bootstrap import instrument_loader, instrument_scheduler, market_feed_manager
 from app.core.http_client import http_client
 from app.core.logging import configure_logging
 
@@ -22,7 +22,7 @@ async def startup():
     # Start websocket listener
     #
     logger.info("Starting websocket manager .....")
-    await websocket_manager.start()
+    await market_feed_manager.start()
 
     logger.info("Startup complete")
 
@@ -40,7 +40,7 @@ async def shutdown():
     # Close websocket and http client
     #
     logger.info("stopping websocket manager .....")
-    await websocket_manager.stop()
+    await market_feed_manager.stop()
     logger.info("stopping http client .....")
     await http_client.aclose()
 

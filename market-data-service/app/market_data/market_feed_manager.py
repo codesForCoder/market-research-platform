@@ -1,13 +1,15 @@
-from app.market_data.client import MarketDataClient
+from typing import Iterable
+
+from app.market_data.market_feed_client import MarketFeedClient
 
 
-class WebSocketManager:
+class MarketFeedManager:
 
     def __init__(
         self,
-        clients: list[MarketDataClient],
+        clients: Iterable[MarketFeedClient],
     ) -> None:
-        self._clients: list[MarketDataClient] = clients
+        self._clients: tuple[MarketFeedClient, ...] = tuple(clients)
 
     async def start(self) -> None:
 

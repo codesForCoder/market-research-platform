@@ -1,10 +1,15 @@
-from typing import Iterable
-from loguru import logger
+from collections import Counter
+import random
+from typing import Iterable, List
+
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.bootstrap import repository_manager
+from app.bootstrap import repository_manager, subscription_manager
+from app.market_data.subscription_manager import SubscriptionManager
+from app.models.exchange import Exchange
 from app.models.instrument import Instrument
 from app.models.instrument_id import InstrumentId
+from app.models.segment import Segment
 from app.repository.instrument_repository import InstrumentRepository
 
 router = APIRouter(
@@ -23,21 +28,61 @@ def get_repository() -> InstrumentRepository:
             detail="Instrument repository not loaded yet. Please wait for startup to complete.",
         )
     return repository_manager.get()
+def get_subscription_manager() -> SubscriptionManager :
+    return subscription_manager
 
+@router.post("/subscribe")
+async def subscribe_instruments(
+        repository: InstrumentRepository = Depends(get_repository),
+        subs_manager: SubscriptionManager = Depends(get_subscription_manager),
+):
+    instruments : List[Instrument] = repository.get_by_exchange_segment(
+        exchange=Exchange.BSE,
+        segment=Segment.INDEX
+    )
+    least_busy_client = subs_manager.get_least_busy_client()
+    await subs_manager.subscribe(
+        client=least_busy_client,
+        instruments=instruments
+    )
+    return {"message": "Subscribed successfully",
+            "subscribeInstruments": list(instruments)}
+
+
+@router.post("/unsubscribe")
+async def unsubscribe_instruments(
+        repository: InstrumentRepository = Depends(get_repository),
+        subs_manager: SubscriptionManager = Depends(get_subscription_manager),
+):
+    instruments: List[Instrument] = repository.get_by_exchange_segment(
+        exchange=Exchange.BSE,
+        segment=Segment.INDEX,
+    )
+    sample_size = min(35, len(instruments))
+    random_instruments = random.sample(instruments, k=sample_size)
+
+    await subs_manager.unsubscribe(random_instruments)
+    return {"message": "Unsubscribed successfully",
+            "unsubscribeInstruments": list(random_instruments)}
 
 @router.get("/stats")
 def repository_stats(
     repository: InstrumentRepository = Depends(get_repository),
 ):
+    #This is a playground api for finding stuffs
+    # This will be used for all kind of data retrival dry run
     exchange_segments_count = []
-    exchange_segments = repository.get_exchange_segments()
-    for exchange, segment in exchange_segments:
-       items = repository.get_by_exchange_segment(exchange , segment)
-       exchange_segments_count.append({
-           "exchange": exchange,
-           "segment": segment,
-           "count": len(items)
-       })
+    repo_iter : Iterable[Instrument] = iter(repository)
+    counts = Counter()
+    for instrument in repo_iter :
+        counts[(instrument.exchange,instrument.segment)] +=1
+
+    for (exchange, segment), count in counts.items():
+        exchange_segments_count.append({
+            "exchange": exchange,
+            "segment": segment,
+            "count": count
+        })
 
     return {
         "total_instruments": len(repository),

@@ -1,11 +1,13 @@
-from app.brokers.dhan.dhan_market_data_client import DhanMarketDataClient
+from app.brokers.dhan.dhan_market_feed_client import DhanMarketFeedClient
+from app.core.config import get_settings
 from app.core.http_client import http_client
 
 from app.brokers.dhan.instrument_downloader import InstrumentDownloader
 from app.brokers.dhan.seed_csv_loader import SeedCsvLoader
 from app.brokers.dhan.instrument_data_source import InstrumentDataSource
 from app.brokers.dhan.instrument_mapper import DhanInstrumentMapper
-from app.market_data.websocket_manager import WebSocketManager
+from app.market_data.market_feed_manager import MarketFeedManager
+from app.market_data.subscription_manager import SubscriptionManager
 
 from app.repository.repository_builder import RepositoryBuilder
 from app.repository.repository_manager import RepositoryManager
@@ -42,9 +44,12 @@ instrument_scheduler = InstrumentScheduler(
 
 
 #Dhan support 5 clients
-websocket_clients = []
+market_feed_clients = []
 for websocket_client_count in range(5):
-    websocket_clients.append(DhanMarketDataClient())
-websocket_manager = WebSocketManager(
-    websocket_clients
+    market_feed_clients.append(DhanMarketFeedClient(get_settings().DHAN_CLIENT_ID, get_settings().DHAN_ACCESS_TOKEN))
+market_feed_manager = MarketFeedManager(
+    market_feed_clients
+)
+subscription_manager = SubscriptionManager(
+    market_feed_clients
 )

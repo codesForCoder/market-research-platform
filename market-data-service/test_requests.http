@@ -1,0 +1,31 @@
+### GET request to server
+###
+GET http://localhost:8001/api/instruments/exchange-segment?exchange=BSE&segment=I
+
+###
+GET http://localhost:8001/api/instruments?exchange=BSE&segment=I&security_id=2
+
+
+###
+GET http://localhost:8001/api/instruments/stats
+
+
+###
+GET http://localhost:8001/health
+
+###
+GET http://localhost:8001/metrics
+
+###
+GET http://localhost:8001/subscriptions
+
+###
+GET http://localhost:8001/subscriptions/00be006e-b1c9-4b73-ad40-cbe2d6c9f2bf
+
+###
+POST http://localhost:8001/api/instruments/subscribe
+
+###
+POST http://localhost:8001/api/instruments/unsubscribe
+
+
