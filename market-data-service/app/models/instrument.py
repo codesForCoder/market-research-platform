@@ -2,7 +2,10 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
+from app.models.exchange import Exchange
 from app.models.instrument_id import InstrumentId
+from app.models.instrument_type import InstrumentType
+from app.models.segment import Segment
 
 
 class Instrument(BaseModel):
@@ -14,8 +17,8 @@ class Instrument(BaseModel):
 
     security_id: int
 
-    exchange: str
-    segment: str
+    exchange: Exchange
+    segment: Segment
 
     @property
     def instrument_id(self) -> InstrumentId:
@@ -29,7 +32,7 @@ class Instrument(BaseModel):
     custom_symbol: str
     symbol_name: str
 
-    instrument_type: str
+    instrument_type: InstrumentType
 
     expiry_date: datetime | None
 

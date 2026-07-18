@@ -10,9 +10,9 @@ class RepositoryBuilder:
     of Instrument objects.
     """
 
+    @staticmethod
     def build(
-        self,
-        instruments: Iterable[Instrument],
+            instruments: Iterable[Instrument],
     ) -> InstrumentRepository:
 
         repository = InstrumentRepository()

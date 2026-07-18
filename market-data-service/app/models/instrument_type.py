@@ -19,18 +19,23 @@ class InstrumentType(StrEnum):
         OPTCUR: Options of Currency
     """
 
+    # Cash market
+    EQUITY = "EQUITY"
     INDEX = "INDEX"
 
-    EQUITY = "EQUITY"
+    # Equity derivatives
+    FUTURE_INDEX = "FUTIDX"
+    FUTURE_STOCK = "FUTSTK"
 
-    FUTIDX = "FUTIDX"
-    OPTIDX = "OPTIDX"
+    OPTION_INDEX = "OPTIDX"
+    OPTION_STOCK = "OPTSTK"
 
-    FUTSTK = "FUTSTK"
-    OPTSTK = "OPTSTK"
+    # Currency derivatives
+    FUTURE_CURRENCY = "FUTCUR"
+    OPTION_CURRENCY = "OPTCUR"
 
-    FUTCOM = "FUTCOM"
-    OPTFUT = "OPTFUT"
+    # Commodity derivatives
+    FUTURE_COMMODITY = "FUTCOM"
 
-    FUTCUR = "FUTCUR"
-    OPTCUR = "OPTCUR"
+    # Options on futures (MCX)
+    OPTION_FUTURE = "OPTFUT"

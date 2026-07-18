@@ -1,5 +1,9 @@
 from app.brokers.dhan.dhan_columns import DhanColumns
+from app.models.exchange import Exchange
 from app.models.instrument import Instrument
+from app.models.instrument_type import InstrumentType
+from app.models.option_type import OptionType
+from app.models.segment import Segment
 from app.utils.parsers import (
     parse_datetime,
     parse_float,
@@ -18,9 +22,9 @@ class DhanInstrumentMapper:
                 row[DhanColumns.SECURITY_ID]
             ),
 
-            exchange=row[DhanColumns.EXCHANGE],
+            exchange=Exchange(row[DhanColumns.EXCHANGE]),
 
-            segment=row[DhanColumns.SEGMENT],
+            segment=Segment(row[DhanColumns.SEGMENT]),
 
             trading_symbol=row[DhanColumns.TRADING_SYMBOL],
 
@@ -28,7 +32,7 @@ class DhanInstrumentMapper:
 
             symbol_name=row[DhanColumns.SYMBOL_NAME],
 
-            instrument_type=row[DhanColumns.INSTRUMENT_NAME],
+            instrument_type=InstrumentType(row[DhanColumns.INSTRUMENT_NAME]),
 
             expiry_date=parse_datetime(
                 row[DhanColumns.EXPIRY_DATE]
@@ -38,8 +42,14 @@ class DhanInstrumentMapper:
                 row[DhanColumns.STRIKE_PRICE]
             ),
 
-            option_type=parse_option_type(
-                row[DhanColumns.OPTION_TYPE]
+            option_type=(
+                OptionType(parsed_option_type)
+                if (
+                       parsed_option_type := parse_option_type(
+                           row[DhanColumns.OPTION_TYPE]
+                       )
+                   ) is not None
+                else None
             ),
 
             lot_size=parse_int(
