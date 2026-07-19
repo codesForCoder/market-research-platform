@@ -40,6 +40,11 @@ class MarketFeedClient(ABC):
 
     @property
     @abstractmethod
+    def debug(self) -> None:
+        ...
+
+    @property
+    @abstractmethod
     def unique_id(self) -> str:
         ...
 

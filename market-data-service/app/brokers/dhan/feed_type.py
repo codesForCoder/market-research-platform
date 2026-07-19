@@ -1,10 +1,12 @@
-from enum import Enum
-
-from app.brokers.dhan.request_code import RequestCode
+from enum import IntEnum
 
 
-class FeedType(Enum):
-    TICKER = RequestCode.SUBSCRIBE_TICKER
-    QUOTE = RequestCode.SUBSCRIBE_QUOTE
-    FULL = RequestCode.SUBSCRIBE_FULL
-    FULL_MARKET_DEPTH = RequestCode.SUBSCRIBE_FULL_MARKET_DEPTH
+class FeedType(IntEnum):
+    SUBSCRIBE_FULL_5_DEPTH = 21
+    UNSUBSCRIBE_FULL_5_DEPTH = 22
+
+    SUBSCRIBE_FULL_MARKET_20_DEPTH = 23
+    UNSUBSCRIBE_FULL_MARKET_20_DEPTH = 24
+
+    SUBSCRIBE_FULL_MARKET_200_DEPTH = 23
+    UNSUBSCRIBE_FULL_MARKET_200_DEPTH = 24

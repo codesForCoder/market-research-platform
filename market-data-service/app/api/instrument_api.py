@@ -1,7 +1,7 @@
 from collections import Counter
 import random
 from typing import Iterable, List
-
+from loguru import logger
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.bootstrap import repository_manager, subscription_manager
@@ -37,16 +37,18 @@ async def subscribe_instruments(
         subs_manager: SubscriptionManager = Depends(get_subscription_manager),
 ):
     instruments : List[Instrument] = repository.get_by_exchange_segment(
-        exchange=Exchange.BSE,
-        segment=Segment.INDEX
+        exchange=Exchange.NSE,
+        segment=Segment.DERIVATIVES
     )
+    sample_size = min(5, len(instruments))
+    random_instruments = random.sample(instruments, k=sample_size)
     least_busy_client = subs_manager.get_least_busy_client()
     await subs_manager.subscribe(
         client=least_busy_client,
-        instruments=instruments
+        instruments=random_instruments
     )
     return {"message": "Subscribed successfully",
-            "subscribeInstruments": list(instruments)}
+            "subscribeInstruments": list(random_instruments)}
 
 
 @router.post("/unsubscribe")
@@ -54,11 +56,11 @@ async def unsubscribe_instruments(
         repository: InstrumentRepository = Depends(get_repository),
         subs_manager: SubscriptionManager = Depends(get_subscription_manager),
 ):
-    instruments: List[Instrument] = repository.get_by_exchange_segment(
-        exchange=Exchange.BSE,
-        segment=Segment.INDEX,
+    instruments : List[Instrument] = repository.get_by_exchange_segment(
+        exchange=Exchange.NSE,
+        segment=Segment.DERIVATIVES
     )
-    sample_size = min(35, len(instruments))
+    sample_size = min(30, len(instruments))
     random_instruments = random.sample(instruments, k=sample_size)
 
     await subs_manager.unsubscribe(random_instruments)
@@ -71,22 +73,29 @@ def repository_stats(
 ):
     #This is a playground api for finding stuffs
     # This will be used for all kind of data retrival dry run
-    exchange_segments_count = []
-    repo_iter : Iterable[Instrument] = iter(repository)
-    counts = Counter()
-    for instrument in repo_iter :
-        counts[(instrument.exchange,instrument.segment)] +=1
+    # exchange_segments_count = []
+    # repo_iter : Iterable[Instrument] = iter(repository)
+    # counts = Counter()
+    # for instrument in repo_iter :
+    #     counts[(instrument.exchange,instrument.segment)] +=1
+    #
+    # for (exchange, segment), count in counts.items():
+    #     exchange_segments_count.append({
+    #         "exchange": exchange,
+    #         "segment": segment,
+    #         "count": count
+    #     })
 
-    for (exchange, segment), count in counts.items():
-        exchange_segments_count.append({
-            "exchange": exchange,
-            "segment": segment,
-            "count": count
-        })
+    market_feed_clients = subscription_manager.clients()
+    for client in market_feed_clients:
+        logger.info(f"Client: {client.unique_id}")
+        client.debug()
+
+
 
     return {
         "total_instruments": len(repository),
-         "exchange_segments_count": exchange_segments_count,
+         #"exchange_segments_count": exchange_segments_count,
     }
 
 

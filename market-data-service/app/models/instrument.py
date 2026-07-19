@@ -3,9 +3,10 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict
 
 from app.models.exchange import Exchange
+from app.models.segment import Segment
 from app.models.instrument_id import InstrumentId
 from app.models.instrument_type import InstrumentType
-from app.models.segment import Segment
+
 
 
 class Instrument(BaseModel):
