@@ -1,6 +1,11 @@
 from loguru import logger
 
-from app.bootstrap import instrument_loader, instrument_scheduler, market_feed_manager
+from app.bootstrap import (instrument_loader,
+                           instrument_scheduler,
+                           market_feed_manager, market_feed_manager_20, market_feed_manager_200,
+    # market_feed_manager_20,
+    # market_feed_manager_200
+                           )
 from app.core.http_client import http_client
 from app.core.logging import configure_logging
 
@@ -23,12 +28,13 @@ async def startup():
     #
     logger.info("Starting websocket manager .....")
     await market_feed_manager.start()
+    await market_feed_manager_20.start()
+    await market_feed_manager_200.start()
 
     logger.info("Startup complete")
 
 
 async def shutdown():
-
     logger.info("Stopping Market Data Service")
 
     #
@@ -41,6 +47,8 @@ async def shutdown():
     #
     logger.info("stopping websocket manager .....")
     await market_feed_manager.stop()
+    await market_feed_manager_20.stop()
+    await market_feed_manager_200.stop()
     logger.info("stopping http client .....")
     await http_client.aclose()
 

@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from pympler import asizeof, muppy
 from pympler.summary import summarize , print_
 
-from app.bootstrap import subscription_manager
+from app.bootstrap import subscription_manager, subscription_manager_20, subscription_manager_200
 
 router = APIRouter()
 
@@ -15,9 +15,15 @@ async def health():
         "status": "UP"
     }
 
+
 @router.get("/subscriptions")
 async def subscriptions():
-    return subscription_manager.subscription_count_per_client
+    return {
+        "5_level": subscription_manager.subscription_count_per_client,
+        "20_level": subscription_manager_20.subscription_count_per_client,
+        "200_level": subscription_manager_200.subscription_count_per_client
+    }
+
 
 @router.get("/subscriptions/{client_id}")
 async def subscriptions(client_id: str):

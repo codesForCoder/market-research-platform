@@ -1,4 +1,5 @@
 from app.brokers.dhan.dhan_market_feed_client import DhanMarketFeedClient
+from app.brokers.dhan.dhan_market_feed_full_depth_client import DhanMarketFeedFullDepthClient
 from app.core.config import get_settings
 from app.core.http_client import http_client
 
@@ -43,13 +44,35 @@ instrument_scheduler = InstrumentScheduler(
 )
 
 
-#Dhan support 5 clients
+#Dhan support 5 clients - 3 allocated to 5 depth , 1 for 20 depth, 1 for 200 depth
 market_feed_clients = []
-for websocket_client_count in range(5):
+for websocket_client_count in range(get_settings().DHAN_5_DEPTH_WEBSOCKET_ALLOCATION):
     market_feed_clients.append(DhanMarketFeedClient(get_settings().DHAN_CLIENT_ID, get_settings().DHAN_ACCESS_TOKEN))
 market_feed_manager = MarketFeedManager(
     market_feed_clients
 )
 subscription_manager = SubscriptionManager(
     market_feed_clients
+)
+
+market_feed_clients_20 = []
+for websocket_client_count in range(get_settings().DHAN_20_DEPTH_WEBSOCKET_ALLOCATION):
+    market_feed_clients_20.append(DhanMarketFeedFullDepthClient(get_settings().DHAN_CLIENT_ID, get_settings().DHAN_ACCESS_TOKEN , 20))
+
+market_feed_manager_20 = MarketFeedManager(
+    market_feed_clients_20
+)
+subscription_manager_20 = SubscriptionManager(
+    market_feed_clients_20
+)
+
+market_feed_clients_200 = []
+for websocket_client_count in range(get_settings().DHAN_200_DEPTH_WEBSOCKET_ALLOCATION):
+    market_feed_clients_200.append(DhanMarketFeedFullDepthClient(get_settings().DHAN_CLIENT_ID, get_settings().DHAN_ACCESS_TOKEN , 200))
+
+market_feed_manager_200 = MarketFeedManager(
+    market_feed_clients_200
+)
+subscription_manager_200 = SubscriptionManager(
+    market_feed_clients_200
 )
