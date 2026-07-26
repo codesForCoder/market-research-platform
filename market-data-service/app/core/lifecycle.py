@@ -2,7 +2,7 @@ from loguru import logger
 
 from app.bootstrap import (instrument_loader,
                            instrument_scheduler,
-                           market_feed_manager, market_feed_manager_20, market_feed_manager_200,
+                           market_feed_manager, market_feed_manager_20, market_feed_manager_200, option_chain_scheduler,
     # market_feed_manager_20,
     # market_feed_manager_200
                            )
@@ -30,7 +30,8 @@ async def startup():
     await market_feed_manager.start()
     await market_feed_manager_20.start()
     await market_feed_manager_200.start()
-
+    logger.info("Starting option chain http client .....")
+    await option_chain_scheduler.start()
     logger.info("Startup complete")
 
 
@@ -49,6 +50,8 @@ async def shutdown():
     await market_feed_manager.stop()
     await market_feed_manager_20.stop()
     await market_feed_manager_200.stop()
+    logger.info("stopping option chain http client .....")
+    await option_chain_scheduler.stop()
     logger.info("stopping http client .....")
     await http_client.aclose()
 

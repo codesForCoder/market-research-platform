@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     DHAN_5_DEPTH_WEBSOCKET_ALLOCATION: int
     DHAN_20_DEPTH_WEBSOCKET_ALLOCATION: int
     DHAN_200_DEPTH_WEBSOCKET_ALLOCATION: int
+    DHAN_OPTION_API_POLLING_INTERVAL: int
     BASE_DIR : Path = Path(__file__).resolve().parent.parent.parent
     DHAN_INSTRUMENT_MASTER_URL: str
     HTTP_TIMEOUT_SECONDS: int

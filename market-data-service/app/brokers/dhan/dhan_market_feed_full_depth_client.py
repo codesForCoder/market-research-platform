@@ -33,12 +33,12 @@ class DhanMarketFeedFullDepthClient(MarketFeedClient):
             access_token=access_token,
         )
         # For temporary debug
-        instruments = [(MarketFeed.NSE, "1333"),(MarketFeed.NSE, "1334"),(MarketFeed.NSE, "1335"),(MarketFeed.NSE, "1336")]
+        # instruments = [(MarketFeed.NSE, "1333"),(MarketFeed.NSE, "1334"),(MarketFeed.NSE, "1335"),(MarketFeed.NSE, "1336")]
         self._market_feed: FullDepth = FullDepth(
             dhan_context=self._dhan_context,
             # For temporary debug
-            instruments=instruments,
-            # instruments=[],
+            # instruments=instruments,
+            instruments=[],
             depth_level=self._depth_level
         )
 

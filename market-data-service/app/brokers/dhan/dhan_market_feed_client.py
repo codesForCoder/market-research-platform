@@ -30,16 +30,16 @@ class DhanMarketFeedClient(MarketFeedClient):
             access_token=access_token,
         )
         # For temporary debug
-        instruments = [(MarketFeed.NSE, "1333", MarketFeed.Ticker),
-                       (MarketFeed.NSE, "1333", MarketFeed.Quote),
-                       (MarketFeed.NSE, "1333", MarketFeed.Full),
-                       (MarketFeed.NSE, "11915", MarketFeed.Ticker),
-                       (MarketFeed.NSE, "11915", MarketFeed.Full)]
+        # instruments = [(MarketFeed.NSE, "1333", MarketFeed.Ticker),
+        #                (MarketFeed.NSE, "1333", MarketFeed.Quote),
+        #                (MarketFeed.NSE, "1333", MarketFeed.Full),
+        #                (MarketFeed.NSE, "11915", MarketFeed.Ticker),
+        #                (MarketFeed.NSE, "11915", MarketFeed.Full)]
         self._market_feed: MarketFeed = MarketFeed(
             dhan_context=self._dhan_context,
             # For temporary debug
-            instruments=instruments,
-            # instruments=[],
+            # instruments=instruments,
+            instruments=[],
         )
 
     async def start(self) -> None:

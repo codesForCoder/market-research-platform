@@ -1,5 +1,6 @@
 from app.brokers.dhan.dhan_market_feed_client import DhanMarketFeedClient
 from app.brokers.dhan.dhan_market_feed_full_depth_client import DhanMarketFeedFullDepthClient
+from app.brokers.dhan.dhan_option_chain_client import DhanOptionChainClient
 from app.core.config import get_settings
 from app.core.http_client import http_client
 
@@ -8,6 +9,8 @@ from app.brokers.dhan.seed_csv_loader import SeedCsvLoader
 from app.brokers.dhan.instrument_data_source import InstrumentDataSource
 from app.brokers.dhan.instrument_mapper import DhanInstrumentMapper
 from app.market_data.market_feed_manager import MarketFeedManager
+from app.market_data.option_chain_manager import OptionChainManager
+from app.market_data.option_chain_scheduler import OptionChainScheduler
 from app.market_data.subscription_manager import SubscriptionManager
 
 from app.repository.repository_builder import RepositoryBuilder
@@ -75,4 +78,14 @@ market_feed_manager_200 = MarketFeedManager(
 )
 subscription_manager_200 = SubscriptionManager(
     market_feed_clients_200
+)
+
+option_chain_manager = OptionChainManager()
+
+option_chain_client = DhanOptionChainClient(get_settings().DHAN_CLIENT_ID, get_settings().DHAN_ACCESS_TOKEN)
+
+option_chain_scheduler = OptionChainScheduler(
+    option_chain_manager=option_chain_manager,
+    option_chain_client=option_chain_client,
+    polling_interval_seconds=get_settings().DHAN_OPTION_API_POLLING_INTERVAL
 )
