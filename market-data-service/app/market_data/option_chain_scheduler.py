@@ -71,9 +71,9 @@ class OptionChainScheduler:
                     # Publish snapshot to Kafka
 
                 except Exception as e:
-                    logger.exception(
+                    logger.error(
                         "Failed to fetch option chain for {} with error {}",
-                        option_chain_req,e
+                        option_chain_req.custom_symbol,str(e)
                     )
 
             await asyncio.sleep(self._polling_interval_seconds)

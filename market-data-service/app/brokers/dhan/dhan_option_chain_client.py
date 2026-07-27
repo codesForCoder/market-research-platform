@@ -62,6 +62,6 @@ class DhanOptionChainClient(OptionChainClient):
             under_exchange_segment=exchange_segment.value,
             expiry=nearest_date.isoformat()
         )
-        logger.info("Option chain response: {}", response)
+        logger.info("Option chain response with status : {}", response.get('status',"Unknown"))
 
         return None

@@ -81,8 +81,8 @@ class InstrumentDownloader:
             if temp_file.exists():
                 temp_file.unlink()
 
-            logger.exception(
-                "Failed to download instrument master."
+            logger.error(
+                "Failed to download instrument master. {}", str(ex)
             )
 
             raise InstrumentDownloadException(

@@ -4,7 +4,9 @@ from typing import Iterable, List
 from loguru import logger
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.bootstrap import repository_manager, subscription_manager
+from app.api.request_response.instrument_api_response import InstrumentResponseByExchangeSegment, InstrumentElement, \
+    InstrumentResponseById
+from app.bootstrap import repository_manager, subscription_manager, subscription_manager_20, subscription_manager_200
 from app.market_data.subscription_manager import SubscriptionManager
 from app.models.exchange import Exchange
 from app.models.instrument import Instrument
@@ -98,11 +100,24 @@ def repository_stats(
          #"exchange_segments_count": exchange_segments_count,
     }
 
+@router.get("/subscriptions")
+async def subscriptions():
+    return {
+        "5_level": subscription_manager.subscription_count_per_client,
+        "20_level": subscription_manager_20.subscription_count_per_client,
+        "200_level": subscription_manager_200.subscription_count_per_client
+    }
 
-@router.get("")
+
+@router.get("/subscriptions/{client_id}")
+async def subscriptions(client_id: str):
+    return subscription_manager.subscriptions_by_client(client_id)
+
+
+@router.get("/id")
 def get_by_instrument_id(
-    exchange: str,
-    segment: str,
+    exchange: Exchange,
+    segment: Segment,
     security_id: int,
     repository: InstrumentRepository = Depends(get_repository),
 ):
@@ -121,17 +136,39 @@ def get_by_instrument_id(
             detail="Instrument not found",
         )
 
-    return instrument
+    return InstrumentResponseById(
+        instrument=InstrumentElement(
+            exchange=instrument.exchange,
+            segment=instrument.segment,
+            security_id=instrument.security_id,
+            custom_symbol_name=instrument.custom_symbol
+        )
+    )
 
 
-@router.get("/exchange-segment")
+@router.get("/exchange-segment" ,
+            response_model=InstrumentResponseByExchangeSegment)
 def get_by_exchange_segment(
-    exchange: str,
-    segment: str,
+    exchange: Exchange,
+    segment: Segment,
+    limit: int = 100,
+    offset: int = 0,
     repository: InstrumentRepository = Depends(get_repository),
 ):
 
-    return repository.get_by_exchange_segment(
-        exchange=exchange,
-        segment=segment,
-    )
+   instruments = repository.get_by_exchange_segment(exchange, segment)
+   paginated_list = instruments[offset: offset + limit]
+   response = InstrumentResponseByExchangeSegment(
+       instruments=[InstrumentElement(
+           exchange=data.exchange,
+           segment=data.segment,
+           security_id=data.security_id,
+           custom_symbol_name=data.custom_symbol
+       ) for data in paginated_list],
+       total_count=len(instruments),
+       exchange=exchange,
+       segment=segment,
+       limit=limit,
+       offset=offset
+   )
+   return response

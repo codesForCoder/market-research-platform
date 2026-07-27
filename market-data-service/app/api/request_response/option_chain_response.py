@@ -5,10 +5,16 @@ from app.models.instrument import Instrument
 from app.models.segment import Segment
 
 
+class SubscriptionInstrumentResponse(BaseModel):
+    security_id: int
+    exchange: Exchange
+    segment: Segment
+    custom_symbol_name: str
+
 class OptionChainSubscriptionResponse(BaseModel):
-    instrument: Instrument
-    status: str
+    instrument: SubscriptionInstrumentResponse
+    status: str = "Unknown"
 
 class OptionChainUnSubscribeResponse(BaseModel):
-    instrument: Instrument
-    status: str
+    instrument: SubscriptionInstrumentResponse
+    status: str = "Unknown"
