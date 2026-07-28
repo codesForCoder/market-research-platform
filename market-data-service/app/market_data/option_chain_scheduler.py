@@ -49,7 +49,7 @@ class OptionChainScheduler:
         Stops the scheduler gracefully.
         """
         self._running = False
-
+        await self._manager.shutdown()
         if self._task:
             await self._task
 

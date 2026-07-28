@@ -97,6 +97,7 @@ class OptionChainManager:
         """
         async with self._lock:
             self._subscriptions.clear()
+            self._rotation_queue.clear()
             self._has_subscription.clear()
 
     async def wait_for_subscription(self) -> None:
@@ -105,6 +106,9 @@ class OptionChainManager:
         Returns immediately if subscriptions already exist.
         """
         await self._has_subscription.wait()
+
+    async def shutdown(self) -> None:
+        self._has_subscription.set()
 
     async def size(self) -> int:
         """
