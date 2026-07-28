@@ -11,6 +11,11 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
     )
+    #kafka
+    kafka_bootstrap_servers: str
+    kafka_username: str
+    kafka_password: str
+    kafka_ca_cert_path: str
     # Dhan
     DHAN_CLIENT_ID: str
     DHAN_ACCESS_TOKEN: str

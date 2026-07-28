@@ -8,6 +8,8 @@ from app.brokers.dhan.instrument_downloader import InstrumentDownloader
 from app.brokers.dhan.seed_csv_loader import SeedCsvLoader
 from app.brokers.dhan.instrument_data_source import InstrumentDataSource
 from app.brokers.dhan.instrument_mapper import DhanInstrumentMapper
+from app.core.kafka_config import kafka_config
+from app.core.kafka_producer import KafkaProducer
 from app.market_data.market_feed_manager import MarketFeedManager
 from app.market_data.option_chain_manager import OptionChainManager
 from app.market_data.option_chain_scheduler import OptionChainScheduler
@@ -45,7 +47,8 @@ instrument_loader = InstrumentLoader(
 instrument_scheduler = InstrumentScheduler(
     instrument_loader,
 )
-
+#Kafka
+kafka_producer = KafkaProducer(kafka_config)
 
 #Dhan support 5 clients - 3 allocated to 5 depth , 1 for 20 depth, 1 for 200 depth
 market_feed_clients = []

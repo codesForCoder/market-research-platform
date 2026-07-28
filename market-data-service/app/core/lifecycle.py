@@ -3,6 +3,7 @@ from loguru import logger
 from app.bootstrap import (instrument_loader,
                            instrument_scheduler,
                            market_feed_manager, market_feed_manager_20, market_feed_manager_200, option_chain_scheduler,
+                           kafka_producer,
     # market_feed_manager_20,
     # market_feed_manager_200
                            )
@@ -23,6 +24,11 @@ async def startup():
     #
     logger.info("Starting scheduler .....")
     await instrument_scheduler.start()
+    #
+    # Start Kafka producer
+    #
+    logger.info("Starting kafka producer .....")
+    await kafka_producer.start()
     #
     # Start websocket listener
     #
@@ -54,5 +60,10 @@ async def shutdown():
     await option_chain_scheduler.stop()
     logger.info("stopping http client .....")
     await http_client.aclose()
+    #
+    # Stop Kafka producer
+    #
+    logger.info("stopping kafka producer .....")
+    await kafka_producer.stop()
 
     logger.info("Shutdown complete")
