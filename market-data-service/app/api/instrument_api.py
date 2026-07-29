@@ -2,10 +2,11 @@ from collections import Counter
 import random
 from typing import Iterable, List
 from loguru import logger
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException ,status
 
+from app.api.request_response.instrument_api_request import MarketFeedRequest, MarketDepthRequest
 from app.api.request_response.instrument_api_response import InstrumentResponseByExchangeSegment, InstrumentElement, \
-    InstrumentResponseById
+    InstrumentResponseById, MarketFeedResponse, MarketDepthResponse
 from app.bootstrap import repository_manager, subscription_manager, subscription_manager_20, subscription_manager_200
 from app.market_data.subscription_manager import SubscriptionManager
 from app.models.exchange import Exchange
@@ -33,8 +34,11 @@ def get_repository() -> InstrumentRepository:
 def get_subscription_manager() -> SubscriptionManager :
     return subscription_manager
 
-@router.post("/subscribe")
-async def subscribe_instruments(
+@router.post("/subscribe/feed" ,
+             status_code=status.HTTP_200_OK,
+    response_model=MarketFeedResponse)
+async def subscribe_feed(
+        request: MarketFeedRequest,
         repository: InstrumentRepository = Depends(get_repository),
         subs_manager: SubscriptionManager = Depends(get_subscription_manager),
 ):
@@ -53,8 +57,11 @@ async def subscribe_instruments(
             "subscribeInstruments": list(random_instruments)}
 
 
-@router.post("/unsubscribe")
+@router.delete("/unsubscribe/feed" ,
+               status_code=status.HTTP_200_OK,
+               response_model=MarketFeedResponse)
 async def unsubscribe_instruments(
+        request: MarketFeedRequest,
         repository: InstrumentRepository = Depends(get_repository),
         subs_manager: SubscriptionManager = Depends(get_subscription_manager),
 ):
@@ -69,35 +76,74 @@ async def unsubscribe_instruments(
     return {"message": "Unsubscribed successfully",
             "unsubscribeInstruments": list(random_instruments)}
 
+@router.post("/subscribe/depth" ,
+             status_code=status.HTTP_200_OK,
+    response_model=MarketDepthResponse)
+async def subscribe_feed(
+        request: MarketDepthRequest,
+        repository: InstrumentRepository = Depends(get_repository),
+        subs_manager: SubscriptionManager = Depends(get_subscription_manager),
+):
+    instruments : List[Instrument] = repository.get_by_exchange_segment(
+        exchange=Exchange.NSE,
+        segment=Segment.DERIVATIVES
+    )
+    sample_size = min(5, len(instruments))
+    random_instruments = random.sample(instruments, k=sample_size)
+    least_busy_client = subs_manager.get_least_busy_client()
+    await subs_manager.subscribe(
+        client=least_busy_client,
+        instruments=random_instruments
+    )
+    return {"message": "Subscribed successfully",
+            "subscribeInstruments": list(random_instruments)}
+
+
+@router.delete("/unsubscribe/depth" ,
+               status_code=status.HTTP_200_OK,
+               response_model=MarketDepthResponse)
+async def unsubscribe_instruments(
+        request: MarketDepthRequest,
+        repository: InstrumentRepository = Depends(get_repository),
+        subs_manager: SubscriptionManager = Depends(get_subscription_manager),
+):
+    instruments : List[Instrument] = repository.get_by_exchange_segment(
+        exchange=Exchange.NSE,
+        segment=Segment.DERIVATIVES
+    )
+    sample_size = min(30, len(instruments))
+    random_instruments = random.sample(instruments, k=sample_size)
+
+    await subs_manager.unsubscribe(random_instruments)
+    return {"message": "Unsubscribed successfully",
+            "unsubscribeInstruments": list(random_instruments)}
+
+
 @router.get("/stats")
 def repository_stats(
     repository: InstrumentRepository = Depends(get_repository),
 ):
-    #This is a playground api for finding stuffs
-    # This will be used for all kind of data retrival dry run
-    # exchange_segments_count = []
-    # repo_iter : Iterable[Instrument] = iter(repository)
-    # counts = Counter()
-    # for instrument in repo_iter :
-    #     counts[(instrument.exchange,instrument.segment)] +=1
-    #
-    # for (exchange, segment), count in counts.items():
-    #     exchange_segments_count.append({
-    #         "exchange": exchange,
-    #         "segment": segment,
-    #         "count": count
-    #     })
 
-    market_feed_clients = subscription_manager.clients()
-    for client in market_feed_clients:
-        logger.info(f"Client: {client.unique_id}")
-        client.debug()
+    exchange_segments_count = []
+    repo_iter : Iterable[Instrument] = iter(repository)
+    counts = Counter()
+    for instrument in repo_iter :
+        counts[(instrument.exchange,instrument.segment)] +=1
+
+    for (exchange, segment), count in counts.items():
+        exchange_segments_count.append({
+            "exchange": exchange,
+            "segment": segment,
+            "count": count
+        })
+
+
 
 
 
     return {
         "total_instruments": len(repository),
-         #"exchange_segments_count": exchange_segments_count,
+         "exchange_segments_count": exchange_segments_count,
     }
 
 @router.get("/subscriptions")
