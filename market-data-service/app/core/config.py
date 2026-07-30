@@ -1,16 +1,21 @@
 from functools import lru_cache
 from pathlib import Path
 import os
+from loguru import logger
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     ENV : str = os.getenv("APP_ENV", "local")
     model_config = SettingsConfigDict(
-        env_file=(Path(__file__).parent.parent.parent / f".env",Path(__file__).parent.parent.parent / f".env.{ENV}"),
+        env_file=[
+            Path(__file__).parent.parent.parent / f".env.{ENV}",  # Checked FIRST (Overrides .env)
+            Path(__file__).parent.parent.parent / ".env",  # Checked SECOND (Fallback)
+        ],
         env_file_encoding="utf-8",
         extra="ignore",
     )
+    logger.info("Loading settings from {}", model_config)
     #kafka
     kafka_bootstrap_servers: str
     kafka_username: str

@@ -104,6 +104,7 @@ class SubscriptionManager:
 
 
     def subscriptions_by_client(self , client_id: str) -> list[Instrument] | None:
+        logger.info("Getting subscriptions for client: {}", client_id)
         market_feed_client =   next((s for s in self._clients if s.unique_id == client_id), None)
         if market_feed_client:
             return list(self._client_subscriptions[market_feed_client])

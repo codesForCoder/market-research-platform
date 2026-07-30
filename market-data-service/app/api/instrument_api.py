@@ -13,6 +13,7 @@ from app.models.exchange import Exchange
 from app.models.instrument import Instrument
 from app.models.instrument_id import InstrumentId
 from app.models.segment import Segment
+from app.models.websocket_client_type import WebsocketClientType
 from app.repository.instrument_repository import InstrumentRepository
 
 router = APIRouter(
@@ -34,7 +35,7 @@ def get_repository() -> InstrumentRepository:
 def get_subscription_manager() -> SubscriptionManager :
     return subscription_manager
 
-@router.post("/subscribe/feed" ,
+@router.post("/subscribe/feed" , summary="Subscribe to market feed" ,
              status_code=status.HTTP_200_OK,
     response_model=MarketFeedResponse)
 async def subscribe_feed(
@@ -57,7 +58,7 @@ async def subscribe_feed(
             "subscribeInstruments": list(random_instruments)}
 
 
-@router.delete("/unsubscribe/feed" ,
+@router.delete("/unsubscribe/feed" , summary="Unsubscribe from market feed" ,
                status_code=status.HTTP_200_OK,
                response_model=MarketFeedResponse)
 async def unsubscribe_instruments(
@@ -76,7 +77,7 @@ async def unsubscribe_instruments(
     return {"message": "Unsubscribed successfully",
             "unsubscribeInstruments": list(random_instruments)}
 
-@router.post("/subscribe/depth" ,
+@router.post("/subscribe/depth" , summary="Subscribe to market depth",
              status_code=status.HTTP_200_OK,
     response_model=MarketDepthResponse)
 async def subscribe_feed(
@@ -99,7 +100,7 @@ async def subscribe_feed(
             "subscribeInstruments": list(random_instruments)}
 
 
-@router.delete("/unsubscribe/depth" ,
+@router.delete("/unsubscribe/depth" , summary="Unsubscribe from market depth",
                status_code=status.HTTP_200_OK,
                response_model=MarketDepthResponse)
 async def unsubscribe_instruments(
@@ -119,7 +120,7 @@ async def unsubscribe_instruments(
             "unsubscribeInstruments": list(random_instruments)}
 
 
-@router.get("/stats")
+@router.get("/stats" ,summary="Get repository stats" , status_code=status.HTTP_200_OK)
 def repository_stats(
     repository: InstrumentRepository = Depends(get_repository),
 ):
@@ -146,7 +147,7 @@ def repository_stats(
          "exchange_segments_count": exchange_segments_count,
     }
 
-@router.get("/subscriptions")
+@router.get("/subscriptions" , summary="websocket subscriptions" , status_code=status.HTTP_200_OK)
 async def subscriptions():
     return {
         "5_level": subscription_manager.subscription_count_per_client,
@@ -155,12 +156,22 @@ async def subscriptions():
     }
 
 
-@router.get("/subscriptions/{client_id}")
-async def subscriptions(client_id: str):
-    return subscription_manager.subscriptions_by_client(client_id)
+@router.get("/subscriptions/{websocket_type}/{client_id}")
+async def subscriptions(websocket_type: WebsocketClientType, client_id: str):
+    match websocket_type:
+        case WebsocketClientType.MARKET_FEED_WITH_5_DEPTH:
+            data = subscription_manager.subscriptions_by_client(client_id)
+        case WebsocketClientType.MARKET_DEPTH_20:
+            data = subscription_manager_20.subscriptions_by_client(client_id)
+        case WebsocketClientType.MARKET_DEPTH_200:
+            data =  subscription_manager_200.subscriptions_by_client(client_id)
+
+    logger.info("Fetched data - {}",data)
+    return data
 
 
-@router.get("/id")
+@router.get("/id" , summary="get instrument details by id" , status_code=status.HTTP_200_OK
+            ,response_model=InstrumentResponseById)
 def get_by_instrument_id(
     exchange: Exchange,
     segment: Segment,
@@ -192,7 +203,8 @@ def get_by_instrument_id(
     )
 
 
-@router.get("/exchange-segment" ,
+@router.get("/exchange-segment" , summary="Get instruments by exchange and segment" ,
+            status_code=status.HTTP_200_OK,
             response_model=InstrumentResponseByExchangeSegment)
 def get_by_exchange_segment(
     exchange: Exchange,

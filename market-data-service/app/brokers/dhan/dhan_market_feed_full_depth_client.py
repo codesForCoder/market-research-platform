@@ -22,7 +22,7 @@ class DhanMarketFeedFullDepthClient(MarketFeedClient):
         access_token: str,
         depth_level: int
     ) -> None:
-        self._unique_id = uuid4()
+        self._unique_id = str(uuid4())
         self._state = ConnectionState.STOPPED
         self._reader_task : asyncio.Task | None = None
         self._client_id = client_id

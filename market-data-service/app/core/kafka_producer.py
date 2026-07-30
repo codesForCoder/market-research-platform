@@ -19,7 +19,7 @@ class KafkaProducer:
 
         if self._producer is not None:
             return
-
+        logger.info("Kafka cert path {}",self._config.ca_cert_path)
         ssl_context = ssl.create_default_context(
             cafile=self._config.ca_cert_path,
         )

@@ -29,7 +29,7 @@ def get_repository() -> InstrumentRepository:
 
 
 @router.post(
-    "/subscribe",
+    "/subscribe", summary="Subscribe to option chain",
     status_code=status.HTTP_201_CREATED,
     response_model=OptionChainSubscriptionResponse,
     response_model_include={
@@ -84,7 +84,7 @@ async def subscribe(
 
 
 @router.delete(
-    "/unsubscribe",
+    "/unsubscribe", summary="Unsubscribe from option chain",
     status_code=status.HTTP_200_OK,
     response_model=OptionChainUnSubscribeResponse,
     response_model_include={
@@ -137,7 +137,8 @@ async def unsubscribe(
         )
 
 
-@router.get("/subscriptions", response_model=List[OptionChainSubscriptionResponse],
+@router.get("/subscriptions", summary="Get active option subscriptions",
+            response_model=List[OptionChainSubscriptionResponse],
             response_model_include={"__all__": {"instrument": {"custom_symbol_name", "exchange", "segment"}
                                                 }
                                     }

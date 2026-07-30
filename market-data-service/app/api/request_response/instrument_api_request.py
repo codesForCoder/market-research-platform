@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from app.brokers.dhan.dedicated_feed_depth import MarketDepthType
+from app.models.dedicated_feed_depth import MarketDepthType
 from app.models.exchange import Exchange
 from app.models.segment import Segment
 

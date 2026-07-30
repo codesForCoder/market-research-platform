@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from app.core.config import get_settings
-
+from loguru import logger
 
 @dataclass(frozen=True, slots=True)
 class KafkaConfig:
@@ -13,10 +13,9 @@ class KafkaConfig:
     sasl_mechanism: str = "PLAIN"
     client_id: str = "market-research-platform"
 
-
 kafka_config = KafkaConfig(
     bootstrap_servers=get_settings().kafka_bootstrap_servers,
     username=get_settings().kafka_username,
     password=get_settings().kafka_password,
-    ca_cert_path=get_settings().kafka_ca_cert_path,
+    ca_cert_path=(get_settings().BASE_DIR / get_settings().kafka_ca_cert_path),
 )
