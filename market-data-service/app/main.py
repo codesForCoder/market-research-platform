@@ -22,15 +22,11 @@ async def lifespan(app: FastAPI):
     await shutdown()
 
 
-app = FastAPI(
-    title="Market Data Service",
-    version="1.0.0",
-    lifespan=lifespan
-)
+app = FastAPI(title="Market Data Service", version="1.0.0", lifespan=lifespan)
 app.include_router(health_router)
 app.include_router(instrument_route)
 app.include_router(option_chain_route)
-#added global exception handler
+# added global exception handler
 init_exception_handlers(app)
 
 if __name__ == "__main__":

@@ -11,9 +11,6 @@ def configure_logging() -> None:
         sys.stdout,
         level=get_settings().log_level,
         format=(
-            "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "
-            "<level>{level}</level> | "
-            "{name}:{function}:{line} | "
-            "<cyan>{message}</cyan>"
+            "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <level>{level}</level> | {name}:{function}:{line} | <cyan>{message}</cyan>"
         ),
     )

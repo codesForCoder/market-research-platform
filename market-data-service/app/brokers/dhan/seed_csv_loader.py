@@ -7,8 +7,6 @@ from app.exceptions.instrument_exceptions import (
 )
 
 
-
-
 class SeedCsvLoader:
     """
     Returns the bundled seed instrument master CSV.
@@ -29,23 +27,13 @@ class SeedCsvLoader:
 
     def load(self) -> Path:
 
-        seed_file = (
-            self._settings.SEED_DIRECTORY
-            / self._settings.SEED_INSTRUMENT_MASTER_FILE
-        )
+        seed_file = self._settings.SEED_DIRECTORY / self._settings.SEED_INSTRUMENT_MASTER_FILE
 
         if not seed_file.exists():
+            logger.error("Seed instrument master not found: {}", seed_file)
 
-            logger.error(
-                "Seed instrument master not found: {}",seed_file
-            )
+            raise SeedInstrumentNotFoundException("Seed instrument master not found: {}", seed_file)
 
-            raise SeedInstrumentNotFoundException(
-                "Seed instrument master not found: {}",seed_file
-            )
-
-        logger.info(
-            "Using bundled seed instrument master: {}",seed_file
-        )
+        logger.info("Using bundled seed instrument master: {}", seed_file)
 
         return seed_file

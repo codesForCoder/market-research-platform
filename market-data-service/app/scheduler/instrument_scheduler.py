@@ -6,7 +6,6 @@ from app.services.instrument_loader import InstrumentLoader
 
 
 class InstrumentScheduler:
-
     def __init__(
         self,
         instrument_loader: InstrumentLoader,
@@ -14,7 +13,9 @@ class InstrumentScheduler:
 
         self._loader = instrument_loader
         self._settings = get_settings()
-        self._scheduler = AsyncIOScheduler(  timezone=self._settings.TIMEZONE,)
+        self._scheduler = AsyncIOScheduler(
+            timezone=self._settings.TIMEZONE,
+        )
 
     async def start(self) -> None:
 
@@ -25,9 +26,9 @@ class InstrumentScheduler:
                 minute=self._settings.INSTRUMENT_REFRESH_MINUTE,
             ),
             id="instrument_master_refresh",
-            replace_existing=True, #replace existing job
-            max_instances=1, #never run two refreshes concurrently
-            coalesce=True, #if a refresh is already running, skip the next one
+            replace_existing=True,  # replace existing job
+            max_instances=1,  # never run two refreshes concurrently
+            coalesce=True,  # if a refresh is already running, skip the next one
         )
 
         self._scheduler.start()

@@ -12,7 +12,7 @@ class RepositoryBuilder:
 
     @staticmethod
     def build(
-            instruments: Iterable[Instrument],
+        instruments: Iterable[Instrument],
     ) -> InstrumentRepository:
 
         repository = InstrumentRepository()

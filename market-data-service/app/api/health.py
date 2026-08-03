@@ -10,13 +10,13 @@ from app.bootstrap import kafka_producer
 router = APIRouter()
 
 
-@router.get("/health" , summary="Health Check")
+@router.get("/health", summary="Health Check")
 async def health():
 
-    return {
-        "status": "UP"
-    }
-@router.get("/metrics" ,summary= "System Metrics")
+    return {"status": "UP"}
+
+
+@router.get("/metrics", summary="System Metrics")
 async def metrics():
     process = psutil.Process()
     memory_info = process.memory_info()
@@ -33,7 +33,8 @@ async def metrics():
         "num_connections": len(process.net_connections()),
     }
 
-@router.post("/kafka" , summary="Test Kafka Connection")
+
+@router.post("/kafka", summary="Test Kafka Connection")
 async def test_kafka():
 
     try:
@@ -42,7 +43,7 @@ async def test_kafka():
             key="test",
             value={
                 "message": "Hello from Market Research Platform!",
-                "timestamp" : datetime.now().isoformat(),
+                "timestamp": datetime.now().isoformat(),
                 "status": "SUCCESS",
             },
         )

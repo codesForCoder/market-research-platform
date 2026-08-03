@@ -6,22 +6,14 @@ from app.models.instrument_id import InstrumentId
 
 
 class InstrumentRepository:
-
     def __init__(self):
 
         # Primary index
-        self._by_instrument_id: dict[
-            InstrumentId,
-            Instrument
-        ]= {}
+        self._by_instrument_id: dict[InstrumentId, Instrument] = {}
         # One-to-many indexes
-        #key = (instrument.exchange, instrument.segment)
+        # key = (instrument.exchange, instrument.segment)
         # Secondary indexes (1 -> many)
-        self._by_exchange_segment: dict[
-            tuple[str, str],
-            list[Instrument]
-        ] = defaultdict(list)
-
+        self._by_exchange_segment: dict[tuple[str, str], list[Instrument]] = defaultdict(list)
 
     def add(self, instrument: Instrument) -> None:
         """Add an instrument and update all indexes."""
@@ -29,29 +21,22 @@ class InstrumentRepository:
         instrument_id = instrument.instrument_id
 
         if instrument_id in self._by_instrument_id:
-            raise ValueError(
-                f"Duplicate instrument: {instrument_id}"
-            )
+            raise ValueError(f"Duplicate instrument: {instrument_id}")
 
         # Primary index
         self._by_instrument_id[instrument_id] = instrument
 
         # Composite index
-        exchange_segment  = (instrument.exchange, instrument.segment)
-        self._by_exchange_segment[exchange_segment ].append(instrument)
+        exchange_segment = (instrument.exchange, instrument.segment)
+        self._by_exchange_segment[exchange_segment].append(instrument)
 
-    def get_by_instrument_id(
-            self,
-            instrument_id: InstrumentId
-    ) -> Instrument | None:
-        return self._by_instrument_id.get(
-           instrument_id
-        )
+    def get_by_instrument_id(self, instrument_id: InstrumentId) -> Instrument | None:
+        return self._by_instrument_id.get(instrument_id)
 
     def get_by_exchange_segment(
-            self,
-            exchange: str,
-            segment: str,
+        self,
+        exchange: str,
+        segment: str,
     ) -> list[Instrument]:
         return self._by_exchange_segment.get(
             (exchange, segment),

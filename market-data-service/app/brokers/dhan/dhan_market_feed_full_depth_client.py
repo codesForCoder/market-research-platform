@@ -1,10 +1,9 @@
-
 import asyncio
 from typing import Iterable
 from uuid import uuid4
 import json
 import collections
-from dhanhq import DhanContext, FullDepth ,MarketFeed
+from dhanhq import DhanContext, FullDepth, MarketFeed
 from loguru import logger
 from app.brokers.dhan.dhan_exchange_segment import ExchangeSegment
 from app.brokers.dhan.exchange_segment_mapper import ExchangeSegmentMapper
@@ -15,16 +14,10 @@ from app.models.instrument import Instrument
 
 
 class DhanMarketFeedFullDepthClient(MarketFeedClient):
-
-    def __init__(
-        self,
-        client_id: str,
-        access_token: str,
-        depth_level: int
-    ) -> None:
+    def __init__(self, client_id: str, access_token: str, depth_level: int) -> None:
         self._unique_id = str(uuid4())
         self._state = ConnectionState.STOPPED
-        self._reader_task : asyncio.Task | None = None
+        self._reader_task: asyncio.Task | None = None
         self._client_id = client_id
         self._access_token = access_token
         self._depth_level = depth_level
@@ -39,7 +32,7 @@ class DhanMarketFeedFullDepthClient(MarketFeedClient):
             # For temporary debug
             # instruments=instruments,
             instruments=[],
-            depth_level=self._depth_level
+            depth_level=self._depth_level,
         )
 
     async def start(self) -> None:
@@ -55,9 +48,7 @@ class DhanMarketFeedFullDepthClient(MarketFeedClient):
         await self._market_feed.connect()
         self._state = ConnectionState.CONNECTED
 
-        self._reader_task = asyncio.create_task(
-            self._consume_market_events()
-        )
+        self._reader_task = asyncio.create_task(self._consume_market_events())
         logger.info("Dhan full depth market data websocket client started.")
 
     async def stop(self) -> None:
@@ -84,34 +75,40 @@ class DhanMarketFeedFullDepthClient(MarketFeedClient):
         self._state = ConnectionState.STOPPED
         logger.info("Dhan full depth market data client stopped.")
 
-
     async def _consume_market_events(self) -> None:
 
         logger.info("Receive loop started for full depth. State: {}", self._state)
 
         while self._state == ConnectionState.CONNECTED:
             try:
-                logger.info("Waiting for instrument data in full depth {}",self.unique_id)
+                logger.info("Waiting for instrument data in full depth {}", self.unique_id)
                 # Use get_instrument_data() which is async
                 message = await self._get_instrument_data()
-                logger.info("Client {} Received message full depth: {}",self.unique_id,  message)
+                logger.info("Client {} Received message full depth: {}", self.unique_id, message)
 
             except asyncio.CancelledError:
-                logger.info("Client full depth {} Receive loop cancelled due to task cancellation", self.unique_id)
+                logger.info(
+                    "Client full depth {} Receive loop cancelled due to task cancellation",
+                    self.unique_id,
+                )
                 raise
             except Exception as ex:
                 logger.error("Client full depth {}  Receive loop failed: {}", self.unique_id, ex)
         logger.info("Receive loop stopped for full depth. Final state: {}", self._state)
 
     async def subscribe(self, instruments: Iterable[Instrument]) -> None:
-        """Subscribe to market full depth data for the given instruments. """
+        """Subscribe to market full depth data for the given instruments."""
         logger.info(f"Subscribe to Dhan market full depth feed client. elements {len(instruments)}")
         for instrument in instruments:
             exchange_segment = ExchangeSegmentMapper.to_exchange_segment(
-                exchange = instrument.instrument_id.exchange,
+                exchange=instrument.instrument_id.exchange,
                 segment=instrument.instrument_id.segment,
             )
-            internal_instrument = (exchange_segment.value, str(instrument.security_id), FeedType.SUBSCRIBE_FULL_5_DEPTH.value)
+            internal_instrument = (
+                exchange_segment.value,
+                str(instrument.security_id),
+                FeedType.SUBSCRIBE_FULL_5_DEPTH.value,
+            )
             await self._subscribe_symbol_async(internal_instrument)
 
         for instrument in self._market_feed.instruments:
@@ -122,20 +119,21 @@ class DhanMarketFeedFullDepthClient(MarketFeedClient):
 
         for instrument in instruments:
             exchange_segment = ExchangeSegmentMapper.to_exchange_segment(
-                exchange = instrument.instrument_id.exchange,
+                exchange=instrument.instrument_id.exchange,
                 segment=instrument.instrument_id.segment,
             )
-            internal_instrument = (exchange_segment.value, str(instrument.security_id), FeedType.UNSUBSCRIBE_FULL_5_DEPTH.value)
+            internal_instrument = (
+                exchange_segment.value,
+                str(instrument.security_id),
+                FeedType.UNSUBSCRIBE_FULL_5_DEPTH.value,
+            )
             await self._unsubscribe_symbol_async(internal_instrument)
 
         for instrument in self._market_feed.instruments:
             logger.info(f"Instrument: {instrument}")
 
     # Temporarily added as dhan sdk is not working
-    async def _subscribe_symbol_async(
-            self,
-            instrument: tuple[str, str, int]
-    ) -> None:
+    async def _subscribe_symbol_async(self, instrument: tuple[str, str, int]) -> None:
         exchange_segment, security_id, request_code = instrument
         subscription_message = {
             "RequestCode": request_code,
@@ -150,21 +148,19 @@ class DhanMarketFeedFullDepthClient(MarketFeedClient):
 
         logger.info("Sending subscription: {}", subscription_message)
 
-        await self._market_feed.ws.send(
-            json.dumps(subscription_message)
-        )
+        await self._market_feed.ws.send(json.dumps(subscription_message))
 
         # Keep SDK's internal instrument list in sync
         exchange_segment_str, *rest = instrument
-        dhan_internal_instrument = (list(ExchangeSegment).index(exchange_segment_str), *rest)
+        dhan_internal_instrument = (
+            list(ExchangeSegment).index(exchange_segment_str),
+            *rest,
+        )
         if dhan_internal_instrument not in self._market_feed.instruments:
             self._market_feed.instruments.append(dhan_internal_instrument)
 
     # Temporarily added as dhan sdk is not working
-    async def _unsubscribe_symbol_async(
-            self,
-            instrument: tuple[str, str, int]
-    ) -> None:
+    async def _unsubscribe_symbol_async(self, instrument: tuple[str, str, int]) -> None:
 
         exchange_segment, security_id, request_code = instrument
 
@@ -179,12 +175,14 @@ class DhanMarketFeedFullDepthClient(MarketFeedClient):
             ],
         }
         logger.info("Sending unsubscription: {}", unsubscription_message)
-        await self._market_feed.ws.send(
-            json.dumps(unsubscription_message)
-        )
+        await self._market_feed.ws.send(json.dumps(unsubscription_message))
         # Keep SDK's internal instrument list in sync
         exchange_segment_str, *rest = instrument
-        dhan_internal_instrument = (list(ExchangeSegment).index(exchange_segment_str), security_id, FeedType.SUBSCRIBE_FULL_5_DEPTH.value) # for removing from dhan sdk internal list tuple signature need to match of what inserted during subscription
+        dhan_internal_instrument = (
+            list(ExchangeSegment).index(exchange_segment_str),
+            security_id,
+            FeedType.SUBSCRIBE_FULL_5_DEPTH.value,
+        )  # for removing from dhan sdk internal list tuple signature need to match of what inserted during subscription
         if dhan_internal_instrument in self._market_feed.instruments:
             self._market_feed.instruments.remove(dhan_internal_instrument)
 
@@ -210,7 +208,6 @@ class DhanMarketFeedFullDepthClient(MarketFeedClient):
                 if key != "depth":
                     results[key] = value
         return json.dumps(results)
-
 
     @property
     def state(self) -> ConnectionState:

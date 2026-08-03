@@ -45,24 +45,18 @@ class InstrumentLoader:
 
         csv_path = await self._data_source.get_csv()
 
-        logger.info("Reading instrument master: {}",csv_path)
+        logger.info("Reading instrument master: {}", csv_path)
 
         with csv_path.open(
             mode="r",
             encoding="utf-8",
             newline="",
         ) as file:
-
             reader = csv.DictReader(file)
 
-            instruments = (
-                self._mapper.map(row)
-                for row in reader
-            )
+            instruments = (self._mapper.map(row) for row in reader)
 
-            repository = self._repository_builder.build(
-                instruments
-            )
+            repository = self._repository_builder.build(instruments)
 
         self._repository_manager.replace(repository)
 

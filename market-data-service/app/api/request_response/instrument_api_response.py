@@ -19,13 +19,16 @@ class InstrumentResponseByExchangeSegment(BaseModel):
     limit: int
     offset: int
 
+
 class InstrumentResponseById(BaseModel):
     instrument: InstrumentElement
+
 
 class SubscriptionStatus(BaseModel):
     instrument: InstrumentElement
     is_subscribed: bool
     feedback: str | None = None
+
 
 class DepthSubscriptionStatus(BaseModel):
     instrument: InstrumentElement
@@ -33,9 +36,10 @@ class DepthSubscriptionStatus(BaseModel):
     is_subscribed: bool
     feedback: str | None = None
 
+
 class MarketFeedResponse(BaseModel):
     subscription_status: list[SubscriptionStatus]
 
+
 class MarketDepthResponse(BaseModel):
     subscription_status: list[DepthSubscriptionStatus]
-

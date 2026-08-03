@@ -53,6 +53,7 @@ def parse_datetime(value: str) -> datetime | None:
 
     raise ValueError(f"Unsupported datetime format: {value}")
 
+
 def parse_option_type(value: str | None) -> str | None:
     if value in ("", "XX", None):
         return None

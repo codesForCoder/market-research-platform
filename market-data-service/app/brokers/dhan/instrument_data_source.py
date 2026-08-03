@@ -11,11 +11,10 @@ from app.exceptions.instrument_exceptions import (
 
 
 class InstrumentDataSource:
-
     def __init__(
-            self,
-            downloader: InstrumentDownloader,
-            seed_loader: SeedCsvLoader,
+        self,
+        downloader: InstrumentDownloader,
+        seed_loader: SeedCsvLoader,
     ) -> None:
 
         self._downloader = downloader
@@ -25,29 +24,24 @@ class InstrumentDataSource:
     async def get_csv(self) -> Path:
 
         for attempt in range(
-                1,
-                self._settings.INSTRUMENT_DOWNLOAD_RETRIES + 1,
+            1,
+            self._settings.INSTRUMENT_DOWNLOAD_RETRIES + 1,
         ):
-
             try:
-
                 logger.info(
-                    "Downloading instrument master (attempt {}/{})",attempt ,self._settings.INSTRUMENT_DOWNLOAD_RETRIES
+                    "Downloading instrument master (attempt {}/{})",
+                    attempt,
+                    self._settings.INSTRUMENT_DOWNLOAD_RETRIES,
                 )
 
                 return await self._downloader.download()
 
             except InstrumentDownloadException:
-
-                logger.warning("Download attempt {} failed." ,attempt)
+                logger.warning("Download attempt {} failed.", attempt)
 
                 if attempt < self._settings.INSTRUMENT_DOWNLOAD_RETRIES:
-                    await asyncio.sleep(
-                        self._settings.INSTRUMENT_RETRY_DELAY_SECONDS
-                    )
+                    await asyncio.sleep(self._settings.INSTRUMENT_RETRY_DELAY_SECONDS)
 
-        logger.warning(
-            "Falling back to bundled seed instrument master."
-        )
+        logger.warning("Falling back to bundled seed instrument master.")
 
         return self._seed_loader.load()

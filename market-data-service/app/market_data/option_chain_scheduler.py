@@ -1,10 +1,8 @@
-
 import asyncio
 from loguru import logger
 
 from app.market_data.option_chain_client import OptionChainClient
 from app.market_data.option_chain_manager import OptionChainManager
-
 
 
 class OptionChainScheduler:
@@ -64,7 +62,6 @@ class OptionChainScheduler:
             option_chain_req = await self._manager.next_subscription()
 
             if option_chain_req is not None:
-
                 try:
                     snapshot = await self._client.fetch(option_chain_req)
                     # TODO
@@ -73,7 +70,8 @@ class OptionChainScheduler:
                 except Exception as e:
                     logger.error(
                         "Failed to fetch option chain for {} with error {}",
-                        option_chain_req.custom_symbol,str(e)
+                        option_chain_req.custom_symbol,
+                        str(e),
                     )
 
             await asyncio.sleep(self._polling_interval_seconds)

@@ -4,7 +4,6 @@ from app.market_data.market_feed_client import MarketFeedClient
 
 
 class MarketFeedManager:
-
     def __init__(
         self,
         clients: Iterable[MarketFeedClient],

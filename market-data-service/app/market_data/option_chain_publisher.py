@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 
-class OptionChainPublisher(ABC):
 
+class OptionChainPublisher(ABC):
     @abstractmethod
-    async def publish(self, snapshot):
-        ...
+    async def publish(self, snapshot): ...

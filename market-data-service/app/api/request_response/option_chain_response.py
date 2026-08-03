@@ -11,9 +11,11 @@ class SubscriptionInstrumentResponse(BaseModel):
     segment: Segment
     custom_symbol_name: str
 
+
 class OptionChainSubscriptionResponse(BaseModel):
     instrument: SubscriptionInstrumentResponse
     status: str = "Unknown"
+
 
 class OptionChainUnSubscribeResponse(BaseModel):
     instrument: SubscriptionInstrumentResponse

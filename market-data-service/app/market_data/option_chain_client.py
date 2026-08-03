@@ -1,4 +1,3 @@
-
 from abc import ABC, abstractmethod
 
 from app.models.instrument import Instrument

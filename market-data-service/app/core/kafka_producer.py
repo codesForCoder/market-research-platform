@@ -9,7 +9,6 @@ from app.core.kafka_config import KafkaConfig
 
 
 class KafkaProducer:
-
     def __init__(self, config: KafkaConfig):
 
         self._config = config
@@ -19,7 +18,7 @@ class KafkaProducer:
 
         if self._producer is not None:
             return
-        logger.info("Kafka cert path {}",self._config.ca_cert_path)
+        logger.info("Kafka cert path {}", self._config.ca_cert_path)
         ssl_context = ssl.create_default_context(
             cafile=self._config.ca_cert_path,
         )
@@ -53,7 +52,7 @@ class KafkaProducer:
         self,
         topic: str,
         key: str | None,
-        value:  Any,
+        value: Any,
     ) -> None:
 
         if self._producer is None:
@@ -64,4 +63,4 @@ class KafkaProducer:
             key=key.encode() if key else None,
             value=json.dumps(value, default=str).encode("utf-8"),
         )
-        logger.info("Kafka producer published {}.",json.dumps(value))
+        logger.info("Kafka producer published {}.", json.dumps(value))

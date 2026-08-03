@@ -1,5 +1,7 @@
 from app.brokers.dhan.dhan_market_feed_client import DhanMarketFeedClient
-from app.brokers.dhan.dhan_market_feed_full_depth_client import DhanMarketFeedFullDepthClient
+from app.brokers.dhan.dhan_market_feed_full_depth_client import (
+    DhanMarketFeedFullDepthClient,
+)
 from app.brokers.dhan.dhan_option_chain_client import DhanOptionChainClient
 from app.core.config import get_settings
 from app.core.http_client import http_client
@@ -20,7 +22,6 @@ from app.repository.repository_manager import RepositoryManager
 from app.scheduler.instrument_scheduler import InstrumentScheduler
 
 from app.services.instrument_loader import InstrumentLoader
-
 
 repository_manager = RepositoryManager()
 
@@ -47,40 +48,38 @@ instrument_loader = InstrumentLoader(
 instrument_scheduler = InstrumentScheduler(
     instrument_loader,
 )
-#Kafka
+# Kafka
 kafka_producer = KafkaProducer(kafka_config)
 
-#Dhan support 5 clients - 3 allocated to 5 depth , 1 for 20 depth, 1 for 200 depth
+# Dhan support 5 clients - 3 allocated to 5 depth , 1 for 20 depth, 1 for 200 depth
 market_feed_clients = []
 for websocket_client_count in range(get_settings().DHAN_5_DEPTH_WEBSOCKET_ALLOCATION):
     market_feed_clients.append(DhanMarketFeedClient(get_settings().DHAN_CLIENT_ID, get_settings().DHAN_ACCESS_TOKEN))
-market_feed_manager = MarketFeedManager(
-    market_feed_clients
-)
+market_feed_manager = MarketFeedManager(market_feed_clients)
 subscription_manager = SubscriptionManager(
-    market_feed_clients
+    market_feed_clients, get_settings().DHAN_MAX_SUBSCRIPTIONS_PER_CLIENT_5_DEPTH
 )
 
 market_feed_clients_20 = []
 for websocket_client_count in range(get_settings().DHAN_20_DEPTH_WEBSOCKET_ALLOCATION):
-    market_feed_clients_20.append(DhanMarketFeedFullDepthClient(get_settings().DHAN_CLIENT_ID, get_settings().DHAN_ACCESS_TOKEN , 20))
+    market_feed_clients_20.append(
+        DhanMarketFeedFullDepthClient(get_settings().DHAN_CLIENT_ID, get_settings().DHAN_ACCESS_TOKEN, 20)
+    )
 
-market_feed_manager_20 = MarketFeedManager(
-    market_feed_clients_20
-)
+market_feed_manager_20 = MarketFeedManager(market_feed_clients_20)
 subscription_manager_20 = SubscriptionManager(
-    market_feed_clients_20
+    market_feed_clients_20, get_settings().DHAN_MAX_SUBSCRIPTIONS_PER_CLIENT_20_DEPTH
 )
 
 market_feed_clients_200 = []
 for websocket_client_count in range(get_settings().DHAN_200_DEPTH_WEBSOCKET_ALLOCATION):
-    market_feed_clients_200.append(DhanMarketFeedFullDepthClient(get_settings().DHAN_CLIENT_ID, get_settings().DHAN_ACCESS_TOKEN , 200))
+    market_feed_clients_200.append(
+        DhanMarketFeedFullDepthClient(get_settings().DHAN_CLIENT_ID, get_settings().DHAN_ACCESS_TOKEN, 200)
+    )
 
-market_feed_manager_200 = MarketFeedManager(
-    market_feed_clients_200
-)
+market_feed_manager_200 = MarketFeedManager(market_feed_clients_200)
 subscription_manager_200 = SubscriptionManager(
-    market_feed_clients_200
+    market_feed_clients_200, get_settings().DHAN_MAX_SUBSCRIPTIONS_PER_CLIENT_200_DEPTH
 )
 
 option_chain_manager = OptionChainManager()
@@ -90,5 +89,5 @@ option_chain_client = DhanOptionChainClient(get_settings().DHAN_CLIENT_ID, get_s
 option_chain_scheduler = OptionChainScheduler(
     option_chain_manager=option_chain_manager,
     option_chain_client=option_chain_client,
-    polling_interval_seconds=get_settings().DHAN_OPTION_API_POLLING_INTERVAL
+    polling_interval_seconds=get_settings().DHAN_OPTION_API_POLLING_INTERVAL,
 )

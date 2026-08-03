@@ -15,7 +15,6 @@ from app.models.option_chain_snapshot import OptionChainSnapshot
 
 
 class DhanOptionChainClient(OptionChainClient):
-
     def __init__(
         self,
         client_id: str,
@@ -27,7 +26,7 @@ class DhanOptionChainClient(OptionChainClient):
             client_id=client_id,
             access_token=access_token,
         )
-        self._dhan_client : dhanhq = dhanhq(self._dhan_context)
+        self._dhan_client: dhanhq = dhanhq(self._dhan_context)
 
     async def fetch(
         self,
@@ -37,13 +36,17 @@ class DhanOptionChainClient(OptionChainClient):
             exchange=instrument.instrument_id.exchange,
             segment=instrument.instrument_id.segment,
         )
-        #First getting the latest expiry date
-        raw_response :dict[str ,Any] = self._dhan_client.expiry_list(
+        # First getting the latest expiry date
+        raw_response: dict[str, Any] = self._dhan_client.expiry_list(
             under_security_id=instrument.security_id,
-            under_exchange_segment=exchange_segment.value
+            under_exchange_segment=exchange_segment.value,
         )
-        logger.info("Expiry date response: FOR Instrument {} --> {}",instrument.custom_symbol, raw_response['data'])
-        expiry_dates = DateResponseSchema.model_validate(raw_response['data']).data
+        logger.info(
+            "Expiry date response: FOR Instrument {} --> {}",
+            instrument.custom_symbol,
+            raw_response["data"],
+        )
+        expiry_dates = DateResponseSchema.model_validate(raw_response["data"]).data
         # --- FIND THE NEAREST PRESENT/FUTURE DATE ---
 
         # 1. Grab today's current date object
@@ -60,8 +63,8 @@ class DhanOptionChainClient(OptionChainClient):
         response = self._dhan_client.option_chain(
             under_security_id=instrument.security_id,
             under_exchange_segment=exchange_segment.value,
-            expiry=nearest_date.isoformat()
+            expiry=nearest_date.isoformat(),
         )
-        logger.info("Option chain response with status : {}", response.get('status',"Unknown"))
+        logger.info("Option chain response with status : {}", response.get("status", "Unknown"))
 
         return None

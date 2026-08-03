@@ -1,12 +1,16 @@
 from loguru import logger
 
-from app.bootstrap import (instrument_loader,
-                           instrument_scheduler,
-                           market_feed_manager, market_feed_manager_20, market_feed_manager_200, option_chain_scheduler,
-                           kafka_producer,
+from app.bootstrap import (
+    instrument_loader,
+    instrument_scheduler,
+    market_feed_manager,
+    market_feed_manager_20,
+    market_feed_manager_200,
+    option_chain_scheduler,
+    kafka_producer,
     # market_feed_manager_20,
     # market_feed_manager_200
-                           )
+)
 from app.core.http_client import http_client
 from app.core.logging import configure_logging
 

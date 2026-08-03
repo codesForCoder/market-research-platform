@@ -6,7 +6,6 @@ from app.market_data.connection_state import ConnectionState
 
 
 class MarketFeedClient(ABC):
-
     @abstractmethod
     async def start(self) -> None:
         """Start the market feed."""
@@ -35,18 +34,15 @@ class MarketFeedClient(ABC):
 
     @property
     @abstractmethod
-    def state(self) -> ConnectionState:
-        ...
+    def state(self) -> ConnectionState: ...
 
     @property
     @abstractmethod
-    def debug(self) -> None:
-        ...
+    def debug(self) -> None: ...
 
     @property
     @abstractmethod
-    def unique_id(self) -> str:
-        ...
+    def unique_id(self) -> str: ...
 
     @property
     def is_connected(self) -> bool:

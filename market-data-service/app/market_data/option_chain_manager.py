@@ -1,10 +1,9 @@
-
-
 import asyncio
 from collections import deque
 from typing import Tuple
 
 from app.models.instrument import Instrument
+
 
 class OptionChainManager:
     """

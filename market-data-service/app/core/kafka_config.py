@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from app.core.config import get_settings
 from loguru import logger
 
+
 @dataclass(frozen=True, slots=True)
 class KafkaConfig:
     bootstrap_servers: str
@@ -12,6 +13,7 @@ class KafkaConfig:
     security_protocol: str = "SASL_SSL"
     sasl_mechanism: str = "PLAIN"
     client_id: str = "market-research-platform"
+
 
 kafka_config = KafkaConfig(
     bootstrap_servers=get_settings().kafka_bootstrap_servers,

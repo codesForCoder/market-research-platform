@@ -10,12 +10,15 @@ class InstrumentInput(BaseModel):
     exchange: Exchange
     segment: Segment
 
+
 class DepthInput(BaseModel):
     instrument: InstrumentInput
     depth: MarketDepthType
 
+
 class MarketFeedRequest(BaseModel):
     instruments: list[InstrumentInput]
+
 
 class MarketDepthRequest(BaseModel):
     instruments: list[DepthInput]

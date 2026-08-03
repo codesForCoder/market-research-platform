@@ -8,13 +8,8 @@ from app.models.instrument_id import InstrumentId
 from app.models.instrument_type import InstrumentType
 
 
-
 class Instrument(BaseModel):
-
-    model_config = ConfigDict(
-        frozen=True,
-        extra="forbid"
-    )
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
     security_id: int
 
@@ -49,9 +44,7 @@ class Instrument(BaseModel):
 
         # Two instruments are identical if their core ID values match
         return (
-                self.security_id == other.security_id and
-                self.exchange == other.exchange and
-                self.segment == other.segment
+            self.security_id == other.security_id and self.exchange == other.exchange and self.segment == other.segment
         )
 
     @computed_field

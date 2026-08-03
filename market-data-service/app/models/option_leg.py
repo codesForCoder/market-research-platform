@@ -5,7 +5,6 @@ from app.models.greeks import Greeks
 
 @dataclass(frozen=True, slots=True)
 class OptionLeg:
-
     security_id: int
 
     ltp: float

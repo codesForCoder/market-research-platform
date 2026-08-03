@@ -9,7 +9,6 @@ from app.exceptions.instrument_exceptions import (
 )
 
 
-
 class InstrumentDownloader:
     """
     Downloads the latest Dhan instrument master CSV.
@@ -41,50 +40,37 @@ class InstrumentDownloader:
             exist_ok=True,
         )
 
-        destination = (
-            output_directory
-            / self._settings.INSTRUMENT_MASTER_FILE
-        )
+        destination = output_directory / self._settings.INSTRUMENT_MASTER_FILE
 
         temp_file = destination.with_suffix(".tmp")
 
         logger.info(
-            "Downloading Dhan instrument master from {}",self._settings.DHAN_INSTRUMENT_MASTER_URL
+            "Downloading Dhan instrument master from {}",
+            self._settings.DHAN_INSTRUMENT_MASTER_URL,
         )
 
         try:
-
             async with self._client.stream(
                 "GET",
                 self._settings.DHAN_INSTRUMENT_MASTER_URL,
             ) as response:
-
                 response.raise_for_status()
 
                 with temp_file.open("wb") as file:
-
                     async for chunk in response.aiter_bytes():
-
                         file.write(chunk)
 
             # Atomic replace
             temp_file.replace(destination)
 
-            logger.info(
-                "Instrument master downloaded successfully: {}",destination
-            )
+            logger.info("Instrument master downloaded successfully: {}", destination)
 
             return destination
 
         except Exception as ex:
-
             if temp_file.exists():
                 temp_file.unlink()
 
-            logger.error(
-                "Failed to download instrument master. {}", str(ex)
-            )
+            logger.error("Failed to download instrument master. {}", str(ex))
 
-            raise InstrumentDownloadException(
-                "Unable to download Dhan instrument master."
-            ) from ex
+            raise InstrumentDownloadException("Unable to download Dhan instrument master.") from ex
