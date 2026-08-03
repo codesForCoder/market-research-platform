@@ -43,3 +43,8 @@ class MarketFeedResponse(BaseModel):
 
 class MarketDepthResponse(BaseModel):
     subscription_status: list[DepthSubscriptionStatus]
+
+
+class SubscribedInstrumentsResponse(BaseModel):
+    instruments: list[InstrumentElement]
+    total_count: int

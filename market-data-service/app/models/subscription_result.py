@@ -9,6 +9,7 @@ class SubscriptionResult:
     instrument: Instrument
     success: bool
     error: str | None
+    depth: int = 5
 
     def to_status(self) -> SubscriptionStatus:
         return SubscriptionStatus(
@@ -16,7 +17,7 @@ class SubscriptionResult:
                 segment=self.instrument.segment,
                 exchange=self.instrument.exchange,
                 security_id=self.instrument.security_id,
-                custom_symbol_name=self.instrument.custom_symbol_name,
+                custom_symbol_name=self.instrument.custom_symbol,
             ),
             is_subscribed=self.success,
             feedback=self.error,
