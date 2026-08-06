@@ -1,29 +1,30 @@
 from datetime import datetime
+from typing import Any
 
 import psutil
-from fastapi import APIRouter, HTTPException
-from pympler import muppy
-from pympler.summary import summarize, print_
+from fastapi import APIRouter, HTTPException, status
 
+# from pympler import muppy
+# from pympler.summary import print_, summarize
 from app.bootstrap import kafka_producer
 
 router = APIRouter()
 
 
-@router.get("/health", summary="Health Check")
+@router.get("/health", summary="Health Check", response_model=dict[str, str], status_code=status.HTTP_200_OK)
 async def health():
 
     return {"status": "UP"}
 
 
-@router.get("/metrics", summary="System Metrics")
+@router.get("/metrics", summary="System Metrics", response_model=dict[str, Any], status_code=status.HTTP_200_OK)
 async def metrics():
     process = psutil.Process()
     memory_info = process.memory_info()
 
-    all_objects = muppy.get_objects()
-    sum1 = summarize(all_objects)
-    print_(sum1)
+    # all_objects = muppy.get_objects()
+    # sum1 = summarize(all_objects)
+    # print_(sum1)
 
     return {
         "cpu_percent": process.cpu_percent(interval=0.1),
@@ -34,7 +35,7 @@ async def metrics():
     }
 
 
-@router.post("/kafka", summary="Test Kafka Connection")
+@router.post("/kafka", summary="Test Kafka Connection", response_model=dict[str, str], status_code=status.HTTP_200_OK)
 async def test_kafka():
 
     try:
